@@ -1,10 +1,37 @@
-import * as WebBrowser from 'expo-web-browser';
-import * as React from 'react';
-import { Image, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { ScrollView } from 'react-native-gesture-handler';
+import * as WebBrowser from 'expo-web-browser'
+import * as React from 'react'
+import {Image, Platform, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
+import {ScrollView} from 'react-native-gesture-handler'
+import * as Google from 'expo-google-app-auth'
+
+
+async function signInWithGoogleAsync() {
+  try {
+    const result = await Google.logInAsync({
+      androidClientId: YOUR_CLIENT_ID_HERE,
+      iosClientId: YOUR_CLIENT_ID_HERE,
+      scopes: ['profile', 'email'],
+    })
+
+    if (result.type === 'success') {
+      console.log(result)
+      return result.accessToken
+    } else {
+      return {cancelled: true}
+    }
+  } catch (e) {
+    console.log(e)
+    return {error: true}
+  }
+}
 
 
 export default function HomeScreen() {
+  const onPress = async () => {
+    let newVar = await signInWithGoogleAsync()
+    console.log("signIn", newVar)
+  }
+
   return (
     <View style={styles.container}>
       <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
@@ -20,23 +47,17 @@ export default function HomeScreen() {
         </View>
 
         <View style={styles.helpContainer}>
-          <TouchableOpacity onPress={handleHelpPress} style={styles.helpLink}>
+          <TouchableOpacity onPress={onPress} style={styles.helpLink}>
             <Text style={styles.helpLinkText}>Help, it didn’t automatically reload!</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
     </View>
-  );
+  )
 }
 
 HomeScreen.navigationOptions = {
   header: null,
-};
-
-function handleHelpPress() {
-  WebBrowser.openBrowserAsync(
-    'https://docs.expo.io/versions/latest/get-started/create-a-new-app/#making-your-first-change'
-  );
 }
 
 const styles = StyleSheet.create({
@@ -95,7 +116,7 @@ const styles = StyleSheet.create({
     ...Platform.select({
       ios: {
         shadowColor: 'black',
-        shadowOffset: { width: 0, height: -3 },
+        shadowOffset: {width: 0, height: -3},
         shadowOpacity: 0.1,
         shadowRadius: 3,
       },
@@ -126,4 +147,4 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#2e78b7',
   },
-});
+})
